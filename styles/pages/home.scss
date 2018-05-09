@@ -1,5 +1,35 @@
-@import '../partials/core';
+@import "../partials/core";
 
 body {
   width: 70%;
+}
+
+label {
+  display: block;
+  font-size: 1.4rem;
+  margin-top: 1rem;
+}
+
+input[type="text"] {
+  display: block;
+  font-size: 1.6rem;
+  font-family: inherit;
+  padding: 0.75rem;
+  margin: 0.5rem 0;
+  width: 100%;
+}
+
+button[type="submit"] {
+  font-size: 2rem;
+  width: 20rem;
+  height: 5rem;
+  background-color: darkblue;
+  color: white;
+  border-radius: 0;
+  border: 0;
+  box-shadow: none;
+  margin: 1rem auto;
+  padding: 0;
+  box-sizing: border-box;
+  cursor: pointer;
 }

@@ -37,6 +37,9 @@ paths = {
   },
   'jekyll': {
     src: siteSrc + '/**/*',
+  },
+  'fcn': {
+    src: 'scripts/_lambda',
   }
 }
 
@@ -109,19 +112,55 @@ gulp.task('jekyll', function(callback) {
   jekyll.stderr.on('data', jekyllLogger);
 
   jekyll.on('exit', function(code) {
-    callback()
+    callback();
   })
 })
 
 
-gulp.task('watch', function() {
-  gulp.watch(paths.scss.src, ['compile-scss'])
-  gulp.watch(paths.js.src, ['compile-js'])
-  gulp.watch(paths.img.src, ['compress-images'])
-  gulp.watch(paths.jekyll.src, ['build'])
+gulp.task('serve:netlify', function(callback) {
+  let options = ['serve', paths.fcn.src];
+
+  const netlify = spawn('netlify-lambda', options)
+
+  const netlifyLogger = function(buffer) {
+    buffer.toString()
+      .split(/\n/)
+      .forEach(function(msg) {
+        console.log(`netlify-lambda: ${msg}`);
+      })
+  }
+
+  netlify.stdout.on('data', netlifyLogger);
+  netlify.stderr.on('data', netlifyLogger);
+
+  netlify.on('exit', function() {
+    callback();
+  })
 })
 
-gulp.task('serve', function() {
+gulp.task('build:netlify', function(callback) {
+  let options = ['build', paths.fcn.src];
+
+  const netlify = spawn('netlify-lambda', options)
+
+  const netlifyLogger = function(buffer) {
+    buffer.toString()
+      .split(/\n/)
+      .forEach(function(msg) {
+        console.log(`netlify-lambda: ${msg}`);
+      })
+  }
+
+  netlify.stdout.on('data', netlifyLogger);
+  netlify.stderr.on('data', netlifyLogger);
+
+  netlify.on('exit', function() {
+    callback();
+  })
+})
+
+
+gulp.task('serve:site', function() {
   gulp.src(siteDest)
     .pipe(webserver({
       // livereload: true,
@@ -130,11 +169,20 @@ gulp.task('serve', function() {
     }))
 })
 
-gulp.task('build:assets', ['compile-scss', 'compile-js', 'compress-images'])
+gulp.task('watch', function() {
+  gulp.watch(paths.scss.src, ['compile-scss'])
+  gulp.watch(paths.js.src, ['compile-js'])
+  gulp.watch(paths.img.src, ['compress-images'])
+  gulp.watch(paths.jekyll.src, ['build'])
+})
+
+gulp.task('build:assets', ['compile-scss', 'compile-js', 'compress-images', 'build:netlify'])
 
 gulp.task('build', function() {
   runSequence('jekyll', 'build:assets')
 })
+
+gulp.task('serve', ['serve:site', 'serve:netlify'])
 
 gulp.task('develop', ['build', 'serve', 'watch'])
 
