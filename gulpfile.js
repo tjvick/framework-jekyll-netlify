@@ -31,6 +31,10 @@ paths = {
     src: ['scripts/**/*.js', '!scripts/_**/*.js'],
     dest: siteDest + '/js',
   },
+  'jsdir': {
+    src: 'scripts/_direct/*.js',
+    dest: siteDest + '/js',
+  },
   'img': {
     src: 'img/**/*',
     dest: siteDest + '/img',
@@ -57,10 +61,18 @@ gulp.task('compile-scss', function() {
 })
 
 
-gulp.task('compile-js', function() {
-  gulp.src(paths.js.dest, {read: false})
+gulp.task('clean-js', function() {
+  return gulp.src(paths.js.dest, {read: false})
     .pipe(clean());
+})
 
+gulp.task('move-js', function() {
+  // for javascript that doesn't get compiled
+  return gulp.src(paths.jsdir.src)
+    .pipe(gulp.dest(paths.jsdir.dest))
+})
+
+gulp.task('compile-js', function() {
   return gulp.src(paths.js.src, {read: false})
     .pipe(tap(function(file) {
       console.log(`bundling ${file.path}`)
@@ -76,6 +88,9 @@ gulp.task('compile-js', function() {
     .pipe(gulp.dest(paths.js.dest));
 })
 
+gulp.task('build:js', function() {
+  runSequence('clean-js', ['move-js', 'compile-js']);
+})
 
 gulp.task('compress-images', function() {
   gulp.src(paths.img.dest, {read: false})
@@ -117,6 +132,7 @@ gulp.task('jekyll', function(callback) {
 gulp.task('watch', function() {
   gulp.watch(paths.scss.src, ['compile-scss'])
   gulp.watch(paths.js.src, ['compile-js'])
+  gulp.watch(paths.jsdir.src, ['move-js'])
   gulp.watch(paths.img.src, ['compress-images'])
   gulp.watch(paths.jekyll.src, ['build'])
 })
@@ -130,7 +146,7 @@ gulp.task('serve', function() {
     }))
 })
 
-gulp.task('build:assets', ['compile-scss', 'compile-js', 'compress-images'])
+gulp.task('build:assets', ['compile-scss', 'build:js', 'compress-images'])
 
 gulp.task('build', function() {
   runSequence('jekyll', 'build:assets')
