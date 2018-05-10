@@ -2,6 +2,8 @@
     functions = "./_functions"
 
 [build.environment]
+    SQUARE_LOCATION_ID = "CBASEDXsG_ZO85sta6uvxM85rB8gAQ"
+    SQUARE_ACCESS_TOKEN = "sandbox-sq0atb-4nMzC_hOmTQAt2yjlf6EnQ"
     SHEETLINK = "https://docs.google.com/spreadsheets/d/1Lg7JE7uzoMKXapmN7q-kAvosO75GycBNWyWAGHob0kA/edit?usp=sharing"
     APIKEY = "AIzaSyCDVeEiPwrLnaYclYNhcBUiPiGGulfvwqk"
     SPREADSHEET_ID = '1Lg7JE7uzoMKXapmN7q-kAvosO75GycBNWyWAGHob0kA'

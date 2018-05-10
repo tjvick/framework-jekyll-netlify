@@ -1,0 +1,118 @@
+@import "../partials/core";
+
+$one-seventh-perc: 100% / 7;
+$calendar-border-color: hsla(0, 0%, 0%, 0.2);
+
+.calendar-container {
+  overflow-y: hidden;
+  overflow-x: auto;
+  padding: 1rem;
+  max-width: 1000px;
+  border: 0;
+}
+
+.calendarBox {
+  margin: 0rem;
+  // min-width: 600px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+button {
+  // display: block;
+  width: 10rem;
+  box-shadow: 0;
+  border-radius: 0;
+  background-color: lightblue;
+  cursor: pointer;
+  border: 1px solid black;
+  box-sizing: border-box;
+}
+
+.monthHeader {
+  .monthLabel {
+    height: 4rem;
+    width: 100%;
+    text-align: center;
+    font-size: 2.4rem;
+    background-color: $calendar-border-color;
+    line-height: 4rem;
+    box-sizing: border-box;
+    margin: 0;
+  }
+
+  .dayLabels {
+    width: 100%;
+    box-sizing: border-box;
+
+    .dayLabel {
+      width: $one-seventh-perc;
+      float: left;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 1rem auto;
+    }
+  }
+}
+
+
+.monthbox {
+  width: 100%;
+  border-left: 1px solid $calendar-border-color;
+  border-top: 1px solid $calendar-border-color;
+  box-sizing: border-box;
+}
+
+.weekbox {
+  width: 100%;
+  border-bottom: 1px solid $calendar-border-color;
+  box-sizing: border-box;
+}
+
+.daybox {
+  height: 100px;
+  width: $one-seventh-perc;
+  border-right: 1px solid $calendar-border-color;
+  float: left;
+  background-color: hsla(0, 0%, 0%, 0.0);
+  box-sizing: border-box;
+
+  &:hover {
+    background-color: hsla(0, 0%, 0%, 0.2);
+  }
+
+  .dayDate {
+    color: hsla(0, 0%, 0%, 0.3);
+    float: right;
+    margin: 0.3rem 0.5rem;
+    font-size: 1.5rem;
+  }
+
+  &.current {
+    .dayDate {
+      color: black;
+    }
+  }
+}
+
+.clearfix::after {
+  content: ".";
+  display: block;
+  clear: both;
+  visibility: hidden;
+  line-height: 0;
+  height: 0;
+}
+
+.clearfix {
+  display: inline-block;
+}
+
+html[xmlns] .clearfix {
+  display: block;
+}
+
+* html .clearfix {
+  height: 1%;
+}

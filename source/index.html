@@ -27,15 +27,17 @@ script-srcs:
   <input type="text" id="n-eaters" name="nEaters">
 
   <button type="button">Book</button>
-
 </form>
+
+<button class="checkout" type="button">Checkout</button>
+
 
 <script>
 
-  document.querySelector('button').addEventListener('click', () => {
+  document.querySelector('.booking-form button').addEventListener('click', () => {
     var myForm = document.querySelector('.booking-form');
     var formData = new FormData(myForm);
-    let data = {};
+    var data = {};
     for (var pair of formData.entries()) {
       data[pair[0]] = pair[1];
     }
@@ -54,3 +56,18 @@ script-srcs:
 
 
 </script>
+
+<script>
+
+    document.querySelector('.checkout').addEventListener('click', () => {
+      fetch('http://localhost:9000/checkout', {
+        method: 'GET',
+      })
+      .then(res => res.json())
+      .catch(error => console.error('Error:', error))
+      .then(function(response) {
+        window.location.replace(response.checkout_page_url);
+      });
+    })
+
+  </script>
