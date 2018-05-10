@@ -3,4 +3,3 @@ _site
 .jekyll-metadata
 .vscode
 node_modules
-privatekey.json
