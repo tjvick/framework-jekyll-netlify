@@ -14,8 +14,8 @@
   "devDependencies": {
     "babel-core": "^6.26.3",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-preset-env": "^1.6.1",
-    "browserify": "^16.2.0",
+    "babel-preset-env": "^1.7.0",
+    "browserify": "^16.2.2",
     "gulp": "^3.9.1",
     "gulp-autoprefixer": "^5.0.0",
     "gulp-babel": "^7.0.1",
@@ -27,14 +27,14 @@
     "gulp-sass": "^4.0.1",
     "gulp-sourcemaps": "^2.6.4",
     "gulp-tap": "^1.0.1",
-    "gulp-uglify": "^3.0.0",
+    "gulp-uglify": "^3.0.1",
     "gulp-webserver": "^0.9.1",
     "netlify-lambda": "^0.4.0",
     "run-sequence": "^2.2.1",
     "yamljs": "^0.3.0"
   },
   "dependencies": {
-    "util": "^0.10.3"
+    "util": "^0.10.4"
   },
   "browserslist": [
     "> 0.2%",
