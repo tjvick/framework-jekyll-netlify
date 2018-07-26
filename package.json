@@ -1,7 +1,7 @@
 {
   "name": "framework",
   "version": "1.0.0",
-  "description": "",
+  "description": "Basic Jekyll+Netlify framework",
   "main": "index.js",
   "scripts": {
     "start": "gulp",
@@ -23,15 +23,22 @@
     "gulp-clean": "^0.4.0",
     "gulp-imagemin": "^4.1.0",
     "gulp-minify-css": "^1.2.4",
+    "gulp-responsive": "^2.10.0",
     "gulp-sass": "^4.0.1",
     "gulp-sourcemaps": "^2.6.4",
     "gulp-tap": "^1.0.1",
     "gulp-uglify": "^3.0.0",
     "gulp-webserver": "^0.9.1",
+    "netlify-lambda": "^0.4.0",
     "run-sequence": "^2.2.1",
     "yamljs": "^0.3.0"
   },
   "dependencies": {
     "util": "^0.10.3"
-  }
+  },
+  "browserslist": [
+    "> 0.2%",
+    "last 5 versions",
+    "not dead"
+  ]
 }
