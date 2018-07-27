@@ -25,6 +25,7 @@ const siteSrc = jekyllConfig.source;
 paths = {
   'scss': {
     src: 'styles/pages/*',
+    watch: 'styles/**/*',
   },
   'css': {
     dest: siteDest + '/css',
@@ -250,7 +251,7 @@ gulp.task('serve', ['serve:site', 'serve:netlify']);
 
 // WATCH tasks
 gulp.task('watch', function() {
-  gulp.watch(paths.scss.src, ['compile-scss'])
+  gulp.watch(paths.scss.watch, ['compile-scss'])
   gulp.watch(paths.js.src, ['compile-js'])
   gulp.watch(paths.jsdir.src, ['move-js'])
   gulp.watch(paths.media.src, ['compress-images'])
