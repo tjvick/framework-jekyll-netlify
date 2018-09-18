@@ -1,6 +1,6 @@
 var gulp = require('gulp');
 var sass = require('gulp-sass');
-var clean = require('gulp-clean');
+var del = require('del');
 var minifyCss = require('gulp-minify-css');
 var autoprefixer = require('gulp-autoprefixer');
 var sourcemaps = require('gulp-sourcemaps');
@@ -13,16 +13,15 @@ var tap = require('gulp-tap');
 var uglify = require('gulp-uglify');
 var browserify = require('browserify');
 var { spawn } = require('child_process');
-var runSequence = require('run-sequence');
 var yaml = require('yamljs');
 
 
-jekyllConfig = yaml.load('./_config.yml');
+var jekyllConfig = yaml.load('./_config.yml');
 
-const siteDest = jekyllConfig.destination;
-const siteSrc = jekyllConfig.source;
+var siteDest = jekyllConfig.destination;
+var siteSrc = jekyllConfig.source;
 
-paths = {
+var paths = {
   'scss': {
     src: 'styles/pages/*',
     watch: 'styles/**/*',
@@ -56,12 +55,11 @@ paths = {
 }
 
 // CSS tasks
-gulp.task('clean-css', function() {
-  return gulp.src(paths.css.dest, {read: false})
-    .pipe(clean());
-})
+function cleanCSS() {
+  return del(paths.css.dest);
+}
 
-gulp.task('compile-scss', function() {
+function compileSCSS() {
   return gulp.src(paths.scss.src)
     .pipe(sourcemaps.init({loadMaps: true}))
     .pipe(sass().on('error', sass.logError))
@@ -71,52 +69,46 @@ gulp.task('compile-scss', function() {
     // .pipe(minifyCss())
     .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest(paths.css.dest));
-})
+}
 
-gulp.task('build:css', function() {
-  return runSequence('clean-css', 'compile-scss');
-})
+var buildCSS = gulp.series(cleanCSS, compileSCSS);
 
 // JAVASCRIPT tasks
-gulp.task('clean-js', function() {
-  return gulp.src(paths.js.dest, {read: false})
-    .pipe(clean());
-})
+function cleanJS() {
+  return del(paths.js.dest);
+}
 
-gulp.task('move-js', function() {
+function moveJS() {
   // for javascript that doesn't get compiled
   return gulp.src(paths.jsdir.src)
     .pipe(gulp.dest(paths.jsdir.dest))
-})
+}
 
-gulp.task('compile-js', function() {
+function compileJS() {
   return gulp.src(paths.js.src, {read: false})
     .pipe(tap(function(file) {
       console.log(`bundling ${file.path}`)
       file.contents = browserify(file.path, {debug: true}).bundle();
     }))
     .pipe(buffer())
-    .pipe(sourcemaps.init({loadMaps: true}))
+    // .pipe(sourcemaps.init({loadMaps: true}))
     .pipe(babel())
-    .pipe(uglify().on('error', function(e) {
-      console.log(e);
-    }))
-    .pipe(sourcemaps.write('./'))
+    // .pipe(uglify().on('error', function(e) {
+    //   console.log(e);
+    // }))
+    // .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest(paths.js.dest));
-})
+}
 
-gulp.task('build:js', function() {
-  runSequence('clean-js', ['move-js', 'compile-js']);
-})
+var buildJS = gulp.series(cleanJS, gulp.parallel(moveJS, compileJS));
 
 
 // MEDIA tasks
-gulp.task('clean-media', function() {
-  return gulp.src(paths.media.dest, {read: false})
-    .pipe(clean());
-})
+function cleanMedia() {
+  return del(paths.media.dest);
+}
 
-gulp.task('compress-images', function() {
+function compressImages() {
   return gulp.src(paths.media.src)
     .pipe(responsive({
       '**/*.jpg': [
@@ -152,23 +144,21 @@ gulp.task('compress-images', function() {
       adaptiveFiltering: true,
     }))
     .pipe(gulp.dest(paths.media.dest));
-})
+}
 
-gulp.task('move-media', function() {
-  gulp.src(paths.mediadir.dest, {read: false})
-    .pipe(clean());
+function cleanMediaDir() {
+  return del(paths.mediadir.dest);
+}
 
+function moveMedia() {
   return gulp.src(paths.mediadir.src)
     .pipe(gulp.dest(paths.mediadir.dest));
-})
+}
 
-gulp.task('build:media', function() {
-  runSequence('clean-media', ['compress-images', 'move-media']);
-})
-
+var buildMedia =  gulp.series(gulp.parallel(cleanMedia, cleanMediaDir), gulp.parallel(compressImages, moveMedia));
 
 // JEKYLL tasks
-gulp.task('jekyll', function(callback) {
+function runJekyll(callback) {
   let options = ['build', '--incremental']
 
   const jekyll = spawn('jekyll', options, {
@@ -189,11 +179,11 @@ gulp.task('jekyll', function(callback) {
   jekyll.on('exit', function(code) {
     callback()
   })
-})
+}
 
 
 // NETLIFY LAMBDA tasks
-gulp.task('build:netlify', function(callback) {
+function buildNetlify(callback) {
   let options = ['build', paths.lambda.src];
 
   const netlify = spawn('netlify-lambda', options)
@@ -212,9 +202,9 @@ gulp.task('build:netlify', function(callback) {
   netlify.on('exit', function() {
     callback();
   })
-})
+}
 
-gulp.task('serve:netlify', function(callback) {
+function serveNetlify(callback) {
   let options = ['serve', paths.lambda.src];
 
   const netlify = spawn('netlify-lambda', options)
@@ -233,50 +223,44 @@ gulp.task('serve:netlify', function(callback) {
   netlify.on('exit', function() {
     callback();
   })
-})
+}
 
 
 // SERVE tasks
-gulp.task('serve:site', function() {
+function serveSite() {
   return gulp.src(siteDest)
     .pipe(webserver({
       // livereload: true,
       directoryListing: false,
       port: 8080,
     }))
-})
+}
 
-gulp.task('serve', ['serve:site', 'serve:netlify']);
-
-
-// WATCH tasks
-gulp.task('watch', function() {
-  gulp.watch(paths.scss.watch, ['compile-scss'])
-  gulp.watch(paths.js.src, ['compile-js'])
-  gulp.watch(paths.jsdir.src, ['move-js'])
-  gulp.watch(paths.media.src, ['compress-images'])
-  gulp.watch(paths.mediadir.src, ['move-media'])
-  gulp.watch(paths.jekyll.src, ['build'])
-  gulp.watch(paths.lambda.watch, ['build:netlify'])
-  return gulp.watch(paths.jekyll.src, ['build'])
-})
+var serve = gulp.parallel(serveSite, serveNetlify);
 
 // build assets
-gulp.task('build:prod:assets', ['build:css', 'build:js', 'build:media', 'build:netlify']);
-gulp.task('build:dev:assets', ['build:css', 'build:js', 'build:media'])
+var buildAssetsDev = gulp.parallel(buildCSS, buildJS, buildMedia);
+var buildAssetsProd = gulp.parallel(buildCSS, buildJS, buildMedia, buildNetlify);
 
-// develop build
-gulp.task('build:dev', function() {
-  return runSequence('jekyll', 'build:dev:assets')
-})
+// build site
+var buildDev = gulp.series(runJekyll, buildAssetsDev);
+var buildProd = gulp.series(runJekyll, buildAssetsProd);
 
-// production build
-gulp.task('build', function() {
-  return runSequence('jekyll', 'build:prod:assets')
-})
+// watch
+function watch() {
+  gulp.watch(paths.scss.watch, compileSCSS);
+  gulp.watch(paths.js.src, compileJS);
+  gulp.watch(paths.jsdir.src, moveJS);
+  gulp.watch(paths.media.src, compressImages);
+  gulp.watch(paths.mediadir.src, moveMedia);
+  gulp.watch(paths.lambda.watch, buildNetlify);
+  gulp.watch(paths.jekyll.src, buildDev);
+}
 
-// develop
-gulp.task('develop', ['build:dev', 'serve', 'watch'])
+// exposed tasks
+var develop = gulp.parallel(buildDev, serve, watch);
+gulp.task('build', buildProd);
+gulp.task('develop', develop);
+gulp.task('default', develop);
 
-gulp.task('default', ['develop'])
-
+gulp.task('buildNetlify', buildNetlify)
