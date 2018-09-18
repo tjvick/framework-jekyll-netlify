@@ -4,8 +4,7 @@ var del = require('del');
 var minifyCss = require('gulp-minify-css');
 var autoprefixer = require('gulp-autoprefixer');
 var sourcemaps = require('gulp-sourcemaps');
-var webserver = require("gulp-webserver");
-var imagemin = require('gulp-imagemin');
+var connect = require("gulp-connect");
 var babel = require("gulp-babel");
 var buffer = require('gulp-buffer');
 var responsive = require('gulp-responsive');
@@ -225,15 +224,12 @@ function serveNetlify(callback) {
   })
 }
 
-
-// SERVE tasks
 function serveSite() {
-  return gulp.src(siteDest)
-    .pipe(webserver({
-      // livereload: true,
-      directoryListing: false,
-      port: 8080,
-    }))
+  connect.server({
+    root: siteDest,
+    livereload: false,
+    port: 8080,
+  })
 }
 
 var serve = gulp.parallel(serveSite, serveNetlify);
